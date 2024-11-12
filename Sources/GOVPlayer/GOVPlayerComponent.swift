@@ -33,7 +33,7 @@ extension GOVPlayer{
         @Published fileprivate(set) var seekForward:Double? = nil
         @Published fileprivate(set) var seekBackward:Double? = nil
         @Published fileprivate(set) var usePip:Bool = false
-        
+        public init(){}
         fileprivate func reset(){
             self.progress = 0
             self.startTime = nil

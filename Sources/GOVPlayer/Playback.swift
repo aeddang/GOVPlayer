@@ -73,8 +73,8 @@ extension GOVPlayer {
         // only file
         fileprivate var toMinimizeStallsCount:Int = 0
        
-        
-        convenience init(path: String) {
+        public init(){}
+        public convenience init(path: String) {
             self.init()
             self.path = path
         }
