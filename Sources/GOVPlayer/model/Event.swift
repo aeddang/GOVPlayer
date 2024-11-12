@@ -12,7 +12,7 @@ import AVKit
 extension GOVPlayer{
     
     public enum UIRequest {//input
-        case change(UIState), stay(UIState), lock(Bool)
+        case toggleUIState, change(UIState), stay(UIState), lock(Bool)
     }
     
     public enum UIState :Equatable{

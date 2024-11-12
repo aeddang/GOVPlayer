@@ -111,6 +111,13 @@ extension GOVPlayer{
             .onReceive(self.uiModel.$request) { evt in
                 guard let evt = evt else { return }
                 switch evt {
+                case .toggleUIState :
+                    if self.uiModel.state.isShowing {
+                        self.uiModel.state = .hidden
+                    } else {
+                        self.uiModel.state = .view
+                        self.delayAutoUiHidden()
+                    }
                 case .change(let state):
                     self.uiModel.state = state
                     if state == .hidden {
