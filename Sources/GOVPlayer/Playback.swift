@@ -122,6 +122,7 @@ extension GOVPlayer {
        
         @discardableResult
         func setup (
+            mode:Mode? = nil,
             useSeeking:Bool? = nil,
             usePip:Bool? = nil,
             isMute:Bool? = nil,
@@ -130,6 +131,7 @@ extension GOVPlayer {
             screenRatio:CGFloat? = nil,
             screenGravity:AVLayerVideoGravity? = nil)->ViewModel{
             
+            if let v = mode { self.playMode = v }
             if let v = useSeeking { self.useSeeking = v }
             if let v = usePip { self.usePip = v }
             if let v = isMute { self.isMute = v }
@@ -256,7 +258,7 @@ extension GOVPlayBack {
    
     
     func onDurationChange(_ t:Double){
-        guard let mode = viewModel.playMode else { return }
+        let mode = viewModel.playMode ?? ((t > 0) ? .vod : .live(start: nil, end: nil))
         viewModel.originDuration = t
         if t <= 0 { return }
         let allowSeeking = viewModel.useSeeking ? true : false
