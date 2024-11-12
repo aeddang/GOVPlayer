@@ -58,7 +58,12 @@ extension GOVAVPlayerController {
         self.playerScreenView.destory()
         */
     }
-    
+    /*
+    open override func remoteControlReceived(with event: UIEvent?) {
+        self.onRemoteControlReceived(with: event)
+    }
+    */
+    /*
     @MainActor
     func onRemoteControlReceived(with event: UIEvent?) {
         guard let type = event?.type else { return}
@@ -69,10 +74,10 @@ extension GOVAVPlayerController {
         case .remoteControlPlay:
             self.viewModel.excute(.resume)
         case .remoteControlEndSeekingForward:
-            if self.viewModel.isSeekAble == false {return}
+            if self.viewModel.allowSeeking == false {return}
             self.viewModel.excute(.seekMove(-15))
         case .remoteControlEndSeekingBackward:
-            if self.viewModel.isSeekAble == false {return}
+            if self.viewModel.allowSeeking == false {return}
             self.viewModel.excute(.seekMove(15))
         case .remoteControlNextTrack:
             self.viewModel.excute(.next)
@@ -81,6 +86,7 @@ extension GOVAVPlayerController {
         default: break
         }
     }
+    */
     func onPlayerItemStatusChange(_ playerController: GOVAVPlayerController, Status:AVPlayerItem.Status){}
     func onReasonForWaitingToPlay(_ playerController: GOVAVPlayerController, reason:AVPlayer.WaitingReason){}
     
@@ -126,7 +132,7 @@ extension GOVAVPlayerController {
 }
 
 
-open class CustomPlayerViewController: UIViewController,
+class CustomPlayerViewController: UIViewController,
                                        @preconcurrency GOVAVPlayerController ,
                                        @preconcurrency GOVAVPlayerRunningDelegate{
     var playerDelegate: GOVAVPlayerControllerDelegate
@@ -155,10 +161,6 @@ open class CustomPlayerViewController: UIViewController,
         super.viewDidDisappear(animated)
         self.onViewDidDisappear(animated)
         self.resignFirstResponder()
-    }
-         
-    open override func remoteControlReceived(with event: UIEvent?) {
-        self.onRemoteControlReceived(with: event)
     }
     
     func onPlayerReady() {
@@ -234,9 +236,11 @@ open class CustomAVPlayerViewController: AVPlayerViewController,
         super.viewWillDisappear(animated)
         self.onViewDidDisappear(animated)
     }
+    /*
     open override func remoteControlReceived(with event: UIEvent?) {
         self.onRemoteControlReceived(with: event)
     }
+    */
     func onPlayerReady() {
         self.run()
     }

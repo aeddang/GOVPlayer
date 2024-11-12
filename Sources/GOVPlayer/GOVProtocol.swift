@@ -18,8 +18,8 @@ extension GOVPlayerProtocol {
 
 protocol GOVPlayBack:GOVPlayerProtocol {
     var viewModel:GOVPlayer.ViewModel {get set}
-    func excute(_ request:GOVPlayer.Request)
-    func onStandby(controller:GOVAVPlayerController)
+    func excute(_ request:GOVPlayer.Request, controller:GOVAVPlayerController?)
+    func onStandby()
     func onTimeChange(_ t:Double)
     func onDurationChange(_ t:Double)
     func onLoad()

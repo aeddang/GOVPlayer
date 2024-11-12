@@ -93,7 +93,6 @@ extension GOVPlayer {
         }
         
         func stop() {
-            DataLog.d("on Stop", tag: self.tag)
             guard let player = self.player else {return}
             player.pause()
             player.stop()
@@ -243,8 +242,12 @@ extension GOVPlayer {
             }
             
         }
-        func setupPictureInPicture() {
-            guard let layer = self.playerLayer else {return}
+        
+        func updatePictureInPicture(_ usePip:Bool) {
+            self.usePip = usePip
+            self.setupPictureInPicture()
+        }
+        private func setupPictureInPicture() {
             if !self.usePip {
                 if self.isPip {
                     self.onPipStop()
@@ -252,13 +255,19 @@ extension GOVPlayer {
                 self.currentUsePip = false
                 pipController?.delegate = nil
                 pipController = nil
+                self.viewModel?.onSetup(allowPip: false)
                 return
                 
             }
             if AVPictureInPictureController.isPictureInPictureSupported() {
+                self.viewModel?.onSetup(allowPip: true)
+                guard let layer = self.playerLayer else {
+                    self.playerController?.allowsPictureInPicturePlayback = self.usePip
+                    return
+                }
+                
                 if !self.currentUsePip && self.pipController == nil{
                     pipController = AVPictureInPictureController(playerLayer: layer)
-                    
                     if #available(iOS 14.2, *) {
                         pipController?.canStartPictureInPictureAutomaticallyFromInline = true
                     } 
@@ -267,6 +276,7 @@ extension GOVPlayer {
                 }
                 
             } else {
+                self.viewModel?.onSetup(allowPip: false)
                 self.currentUsePip = false
                 pipController?.delegate = nil
                 pipController = nil
@@ -360,7 +370,7 @@ extension GOVPlayer {
                 else { self.pause() }
                 if ceil(self.initTime) > 0 && duration > 0 {
                     let diff:Double = duration - self.initTime
-                    let seekAble = self.viewModel?.isSeekAble ?? true
+                    let seekAble = self.viewModel?.allowSeeking ?? true
                     DataLog.d("continuousTime " + seekAble.description + " diff " + diff.description, tag: self.tag)
                     if seekAble && diff < 10  { // 10이하 남은곳으로 이동시 처음부터
                         DataLog.d("continuousTime cancel " + diff.description + " " + self.initTime.description , tag: self.tag)
@@ -476,7 +486,7 @@ extension GOVPlayer {
             artwork.extendedLanguageTag = "und"
             item.externalMetadata = [artwork]
         }
-        
+    
         @discardableResult
         func pip(isStart:Bool) -> Bool {
             guard let pip = self.pipController else { return false }
@@ -486,7 +496,7 @@ extension GOVPlayer {
             return true
         }
         func pictureInPictureControllerWillStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
-            pictureInPictureController.requiresLinearPlayback = !(self.viewModel?.isSeekAble ?? true)
+            pictureInPictureController.requiresLinearPlayback = !(self.viewModel?.allowSeeking ?? true)
             self.isPip = true
             self.isPipClose = true
             self.delegate?.onPipStateChanged(true)
@@ -500,10 +510,6 @@ extension GOVPlayer {
             self.isPip = false
             self.delegate?.onPipStateChanged(false)
             self.delegate?.onPipClosed(isStop: self.isPipClose)
-            /*
-             if self.player?.rate != 0 {
-             self.player?.rate = currentRate
-             }*/
         }
         
         func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, failedToStartPictureInPictureWithError error: Error) {

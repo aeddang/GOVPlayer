@@ -10,12 +10,32 @@ import SwiftUI
 import AVKit
 
 extension GOVPlayer{
+    
+    public enum UIRequest {//input
+        case change(UIState), stay(UIState)
+    }
+    
+    public enum UIState :Equatable{
+        case view, hidden
+        public var isShowing:Bool{
+            switch self {
+            case .view : return true
+            default : return false
+            }
+        }
+        
+        public static func == (l:UIState, r:UIState)-> Bool {
+            switch (l, r) {
+            case ( .view, .view):return true
+            case ( .hidden, .hidden):return true
+            default: return false
+            }
+        }
+    }
+    
+    
     public enum Request {//input
-        case load(
-            path:String,
-            autoPlay:Bool = true,
-            initTime:Double = 0.0
-        ),
+        case load(path:String, autoPlay:Bool = true, initTime:Double = 0.0),
              togglePlay,
              resume,
              pause,
@@ -32,7 +52,7 @@ extension GOVPlayer{
                 lang:String? = nil, size:CGFloat? = nil ,
                 color:Color? = nil, position:CGFloat? = nil
              ),
-             pip(Bool),
+             pip(Bool), usePip(Bool),
              next, prev
         
     }
@@ -101,7 +121,12 @@ extension GOVPlayer{
             default : return false
             }
         }
-        
+        public var isLoading:Bool{
+            switch self {
+            case .buffering : return true
+            default : return false
+            }
+        }
         public static func == (l:StreamState, r:StreamState)-> Bool {
             switch (l, r) {
             case ( .buffering, .buffering):return true

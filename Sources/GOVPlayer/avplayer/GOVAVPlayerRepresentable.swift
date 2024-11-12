@@ -23,15 +23,11 @@ extension GOVAVPlayerRepresentable: UIViewControllerRepresentable,
         player.currentVideoGravity = viewModel.screenGravity
         player.currentRatio = viewModel.screenRatio
         
-        self.viewModel.setupExcuter(){ request in
-            self.excute(request)
-        }
         
         if viewModel.useAvPlayerController{
             let playerController = CustomAVPlayerViewController(
                 viewModel: viewModel, player: player, playerDelegate: self
             )
-             
             playerController.delegate = context.coordinator
             playerController.showsPlaybackControls = viewModel.useAvPlayerControllerUI
             playerController.allowsPictureInPicturePlayback = viewModel.usePip
@@ -45,9 +41,13 @@ extension GOVAVPlayerRepresentable: UIViewControllerRepresentable,
                 playerController: playerController
             )
             DispatchQueue.main.async {
-                self.onStandby(controller:playerController)
+                self.onStandby()
+            }
+            self.viewModel.setupExcuter(){ request in
+                self.excute(request, controller: playerController)
             }
             return playerController
+            
         }else{
             let playerController = CustomPlayerViewController(
                 viewModel: self.viewModel, player: player, playerDelegate: self
@@ -59,11 +59,13 @@ extension GOVAVPlayerRepresentable: UIViewControllerRepresentable,
                 runningDelegate: playerController
             )
             DispatchQueue.main.async {
-                self.onStandby(controller:playerController)
+                self.onStandby()
+            }
+            self.viewModel.setupExcuter(){ request in
+                self.excute(request, controller: playerController)
             }
             return playerController
         }
-        
     }
     
     func updateUIViewController(_ uiViewController: UIViewController, context: UIViewControllerRepresentableContext<GOVAVPlayerRepresentable>) {
@@ -78,15 +80,15 @@ extension GOVAVPlayerRepresentable: UIViewControllerRepresentable,
     }
     
     @MainActor
-    func excute(_ request: GOVPlayer.Request) {
-        guard let player = self.viewModel.controller?.govPlayer else {return}
+    func excute(_ request: GOVPlayer.Request, controller:GOVAVPlayerController?) {
+        guard let player = controller?.govPlayer else {return}
         switch request {
         case .load(let path, let autoPlay, let initTime):
             viewModel.reset(isAll: false)
             self.onLoad()
-            
             player.load(path, isAutoPlay:autoPlay, initTime: initTime,
                         assetInfo: self.viewModel.assetInfo, drmData: viewModel.drm)
+            
         
            
         case .togglePlay:
@@ -99,6 +101,7 @@ extension GOVAVPlayerRepresentable: UIViewControllerRepresentable,
         case .pause: onPause()
         case .stop:
             viewModel.reset(isAll: false)
+            self.removeRemoteAction()
             player.stop()
             self.onStoped()
             
@@ -140,7 +143,8 @@ extension GOVAVPlayerRepresentable: UIViewControllerRepresentable,
 
         case .pip(let isStart) :
             player.pip(isStart: isStart)
-    
+        case .usePip(let usePip) :
+            player.updatePictureInPicture(usePip)
         default : break
         }
         
@@ -302,14 +306,15 @@ extension GOVAVPlayerRepresentable: UIViewControllerRepresentable,
     
     @MainActor
     private func onReadyToPlayDurationCheck(_ playerController: GOVAVPlayerController) {
-        let player = playerController.govPlayer.player
         if let player = playerController.govPlayer.player {
             Task {
                 if let d = try await player.currentItem?.asset.load(.duration) {
+                    self.setRemoteAction()
                     let willDuration = Double(CMTimeGetSeconds(d))
                     if willDuration > 0 {
                         DispatchQueue.main.async {
                             self.onDurationChange(willDuration)
+                           self.setRemoteActionSeekAble()
                             playerController.govPlayer.playInit(duration: willDuration)
                         }
                     } else {
@@ -321,6 +326,80 @@ extension GOVAVPlayerRepresentable: UIViewControllerRepresentable,
                 
             }
         }
+    }
+    
+    @MainActor
+    func setRemoteAction(){
+        DataLog.d("setRemoteAction", tag:self.tag)
+        let commandCenter = MPRemoteCommandCenter.shared()
+        commandCenter.togglePlayPauseCommand.addTarget(handler: self.onRemoteTogglePlay)
+        commandCenter.playCommand.addTarget(handler: self.onRemoteResume)
+        commandCenter.pauseCommand.addTarget(handler: self.onRemotePause)
+        commandCenter.skipBackwardCommand.preferredIntervals = [NSNumber(value:-GOVPlayer.seekMoveDefaultValue)]
+        commandCenter.skipForwardCommand.preferredIntervals = [NSNumber(value:GOVPlayer.seekMoveDefaultValue)]
+        commandCenter.skipBackwardCommand.addTarget(handler: self.onRemoteSkipBackward)
+        commandCenter.skipForwardCommand.addTarget(handler: self.onRemoteSkipForward)
+        commandCenter.changePlaybackPositionCommand.addTarget(handler: self.onRemoteChangePlaybackPosition)
+    }
+    
+    @MainActor
+    func removeRemoteAction(){
+        DataLog.d("removeRemoteAction", tag:self.tag)
+        self.setRemoteActionSeekAble(false)
+        let commandCenter = MPRemoteCommandCenter.shared()
+        commandCenter.togglePlayPauseCommand.removeTarget(self.onRemoteTogglePlay)
+        commandCenter.playCommand.removeTarget(self.onRemoteResume)
+        commandCenter.pauseCommand.removeTarget(self.onRemotePause)
+        commandCenter.skipBackwardCommand.preferredIntervals.removeAll()
+        commandCenter.skipForwardCommand.preferredIntervals.removeAll()
+        commandCenter.skipBackwardCommand.removeTarget(self.onRemoteSkipBackward)
+        commandCenter.skipForwardCommand.removeTarget(self.onRemoteSkipForward)
+        commandCenter.changePlaybackPositionCommand.removeTarget(self.onRemoteChangePlaybackPosition)
+    }
+    @MainActor
+    func onRemoteTogglePlay(_ evt:MPRemoteCommandEvent) -> MPRemoteCommandHandlerStatus {
+        self.viewModel.excute(.togglePlay)
+        return MPRemoteCommandHandlerStatus.success
+    }
+    @MainActor
+    func onRemoteResume(_ evt:MPRemoteCommandEvent) -> MPRemoteCommandHandlerStatus {
+        self.viewModel.excute(.resume)
+        return MPRemoteCommandHandlerStatus.success
+    }
+    @MainActor
+    func onRemotePause(_ evt:MPRemoteCommandEvent) -> MPRemoteCommandHandlerStatus {
+        self.viewModel.excute(.pause)
+        return MPRemoteCommandHandlerStatus.success
+    }
+    @MainActor
+    func onRemoteSkipBackward(_ evt:MPRemoteCommandEvent) -> MPRemoteCommandHandlerStatus {
+        self.viewModel.excute(.seekMove(-GOVPlayer.seekMoveDefaultValue, andPlay: nil))
+        return MPRemoteCommandHandlerStatus.success
+    }
+    @MainActor
+    func onRemoteSkipForward(_ evt:MPRemoteCommandEvent) -> MPRemoteCommandHandlerStatus {
+        self.viewModel.excute(.seekMove(GOVPlayer.seekMoveDefaultValue, andPlay: nil))
+        return MPRemoteCommandHandlerStatus.success
+    }
+    @MainActor
+    func onRemoteChangePlaybackPosition(_ evt:MPRemoteCommandEvent) -> MPRemoteCommandHandlerStatus {
+        let seconds = (evt as? MPChangePlaybackPositionCommandEvent)?.positionTime ?? 0
+        self.viewModel.excute(.seek(time: seconds, andPlay: nil))
+        return MPRemoteCommandHandlerStatus.success
+    }
+    
+    func setRemoteActionSeekAble(_ able:Bool? = nil){
+        guard let allow = able ?? self.viewModel.allowSeeking else {return}
+        DataLog.d("setRemoteActionSeekAble " + allow.description, tag:"commandCenter")
+        let commandCenter = MPRemoteCommandCenter.shared()
+        commandCenter.changePlaybackPositionCommand.isEnabled = allow
+        commandCenter.togglePlayPauseCommand.isEnabled = allow
+        commandCenter.pauseCommand.isEnabled = allow
+        commandCenter.playCommand.isEnabled = allow
+        commandCenter.skipBackwardCommand.isEnabled = allow
+        commandCenter.skipForwardCommand.isEnabled = allow
+        commandCenter.seekForwardCommand.isEnabled = allow
+        commandCenter.seekBackwardCommand.isEnabled = allow
     }
 }
 

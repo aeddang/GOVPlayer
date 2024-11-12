@@ -10,16 +10,14 @@ import AVFoundation
 import Combine
 
 extension GOVPlayer {
+    @MainActor public static var seekMoveDefaultValue:Double = 15
     open class ViewModel: ObservableObject {
         private var anyCancellable = Set<AnyCancellable>()
-        fileprivate(set) var controller:GOVAVPlayerController? = nil
         private(set) var path:String = ""
         /*사용자지정 속성*/
         private(set) var useAvPlayerController:Bool = false
         private(set) var useAvPlayerControllerUI:Bool = false
-        private(set) var usePip:Bool = true
-        private(set) var useSeeking:Bool = true // 비디오 서치 사용여부
- 
+        
         /*event*/
         @Published fileprivate(set) var request:Request? = nil{
             didSet{
@@ -32,6 +30,8 @@ extension GOVPlayer {
                 if streamEvent != nil { self.streamEvent = nil }
             }
         }
+       
+        
         @Published fileprivate(set) var error:PlayerError? = nil
         @Published fileprivate(set) var playerState:State? = nil
         @Published fileprivate(set) var streamState:StreamState? = nil
@@ -51,7 +51,11 @@ extension GOVPlayer {
         @Published private(set) var nextEventTime:Double? = nil
         
         @Published fileprivate(set) var isMute:Bool = false
-        @Published fileprivate(set) var isSeekAble:Bool? = nil
+        private(set) var useLoof:Bool = false
+        private(set) var usePip:Bool = true // pip사용여부
+        private(set) var useSeeking:Bool = true // 비디오 서치 사용여부
+        @Published fileprivate(set) var allowSeeking:Bool? = nil
+        @Published private(set) var allowPip:Bool? = nil
         
         private(set) var drm:FairPlayDrm? = nil
         private(set) var prevCertificate:Data? = nil
@@ -62,6 +66,7 @@ extension GOVPlayer {
         fileprivate(set) var originDuration:Double = 0.0
         fileprivate(set) var streamStartTime:Double? = nil
         @Published fileprivate(set) var time:Double = 0.0
+        fileprivate(set) var remainingTime:Double = 0.0
         @Published fileprivate(set) var duration:Double? = nil
         
        
@@ -87,13 +92,14 @@ extension GOVPlayer {
             playMode = nil
             duration = nil
             time = 0
+            remainingTime = 0
             duration = nil
             originTime = 0
             originDuration = 0
             timeProgress = 0
             streamStartTime = nil
             initTime = nil
-            isSeekAble = nil
+            allowSeeking = nil
             error = nil
             streamState = nil
             playerState = nil
@@ -119,6 +125,7 @@ extension GOVPlayer {
             useSeeking:Bool? = nil,
             usePip:Bool? = nil,
             isMute:Bool? = nil,
+            useLoof:Bool? = nil,
             rate:Float? = nil,
             screenRatio:CGFloat? = nil,
             screenGravity:AVLayerVideoGravity? = nil)->ViewModel{
@@ -126,10 +133,15 @@ extension GOVPlayer {
             if let v = useSeeking { self.useSeeking = v }
             if let v = usePip { self.usePip = v }
             if let v = isMute { self.isMute = v }
+            if let v = useLoof { self.useLoof = v }
             if let v = rate { self.rate = v }
             if let v = screenRatio { self.screenRatio = v }
             if let v = screenGravity { self.screenGravity = v }
             return self
+        }
+        
+        func onSetup(allowPip:Bool? = nil){
+            if let v = allowPip { self.allowPip = v }
         }
         
         func setupExcuter (_ completion:@escaping (Request) -> Void) {
@@ -148,14 +160,15 @@ extension GOVPlayer {
             self.requestHandler?(request)
             return self
         }
+        
+       
     }
 
 }
 
 extension GOVPlayBack {
-    func onStandby(controller:GOVAVPlayerController){
-        self.viewModel.controller = controller
-        self.viewModel.streamState = .buffering(0)
+    func onStandby(){
+        self.viewModel.streamState = .stop
     }
     
     func onTimeChange(_ t:Double){
@@ -195,10 +208,11 @@ extension GOVPlayBack {
                 viewModel.streamEvent = .next
             }
         }
+        viewModel.remainingTime = end - current
         viewModel.timeProgress = current/end
         viewModel.time = current
         if current >= end {
-            self.excute(.pause)
+            self.viewModel.excute(.pause)
             self.onCompleted()
         }
     }
@@ -222,12 +236,14 @@ extension GOVPlayBack {
         if let evt = viewModel.playEvents[current] {
             viewModel.streamEvent = .playEvent(evt)
         }
+        
         if let nt = viewModel.nextEventTime {
             let remainTime = end - nt
             if remainTime == current {
                 viewModel.streamEvent = .next
             }
         }
+        viewModel.remainingTime = end - current
         viewModel.timeProgress = current/end
         viewModel.time = current
         if current >= end {
@@ -243,8 +259,8 @@ extension GOVPlayBack {
         guard let mode = viewModel.playMode else { return }
         viewModel.originDuration = t
         if t <= 0 { return }
-        let isSeekAble = viewModel.useSeeking ? true : false
-        viewModel.isSeekAble = isSeekAble
+        let allowSeeking = viewModel.useSeeking ? true : false
+        viewModel.allowSeeking = allowSeeking
         switch mode{
         case .section(let s, let e) :
             viewModel.duration = min(t, e ?? t) - (s ?? 0)
@@ -297,7 +313,7 @@ extension GOVPlayBack {
         DataLog.d("onSeeked", tag: self.tag)
         viewModel.streamEvent = .seeked
         switch viewModel.playerState {
-        case .seek(let double, let isPrevPlay, let isAfterPlay):
+        case .seek(_ , let isPrevPlay, let isAfterPlay):
             viewModel.playerState = isPrevPlay ? .resume : .pause
             if let afterPlay = isAfterPlay {
                 viewModel.request = afterPlay ? .resume : .pause
