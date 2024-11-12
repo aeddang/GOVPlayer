@@ -55,6 +55,12 @@ extension GOVPlayer{
         open func getTimestampString(_ t:Double) -> String {
             return t.toDate().toDateFormatter(dateFormat: "HH:mm")
         }
+        
+        @discardableResult
+        public func excute(_ request:UIRequest)->UIViewModel {
+            self.request = request
+            return self
+        }
     }
     public struct GOVPlayerComponent<Ui>: View, GOVPlayerProtocol where Ui: View {
         
@@ -157,6 +163,9 @@ extension GOVPlayer{
             .onReceive(self.viewModel.$request) { evt in
                 guard let evt = evt else { return }
                 switch evt {
+                case .load :
+                    self.uiModel.reset()
+                    
                 case .seekMove(let t, _):
                     self.uiModel.isSeeking = true
                     if t > 0 {

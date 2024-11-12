@@ -81,7 +81,7 @@ extension GOVPlayer {
         
         
         @discardableResult
-        open func reset(isAll:Bool)->ViewModel{
+        public func reset(isAll:Bool)->ViewModel{
             if let cert = self.drm?.certificate {
                 self.prevCertificate = cert
             }
@@ -121,7 +121,7 @@ extension GOVPlayer {
         }
        
         @discardableResult
-        func setup (
+        public func setup (
             mode:Mode? = nil,
             useSeeking:Bool? = nil,
             usePip:Bool? = nil,
@@ -152,7 +152,7 @@ extension GOVPlayer {
         
         private var requestHandler:((Request) -> Void)? = nil
         @discardableResult
-        func excute(_ request:Request)->ViewModel {
+        public func excute(_ request:Request)->ViewModel {
             switch request {
             case .load(let path, _ , _):
                 self.path = path
