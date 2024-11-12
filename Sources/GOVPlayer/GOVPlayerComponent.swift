@@ -61,7 +61,7 @@ extension GOVPlayer{
         @EnvironmentObject var viewModel:ViewModel
         @EnvironmentObject var uiModel:UIViewModel
         let ui: Ui
-        init(
+        public init(
             @ViewBuilder content: () -> Ui) {
                 self.ui = content()
             }
