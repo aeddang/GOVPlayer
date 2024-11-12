@@ -211,10 +211,10 @@ extension GOVPlayBack {
                 viewModel.streamEvent = .next
             }
         }
-        viewModel.remainingTime = end - current
-        viewModel.timeProgress = current/end
+        viewModel.remainingTime = d - current
+        viewModel.timeProgress = current/d
         viewModel.time = current
-        if current >= end {
+        if current >= d {
             self.viewModel.excute(.pause)
             self.onCompleted()
         }
