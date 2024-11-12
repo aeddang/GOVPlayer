@@ -215,7 +215,7 @@ extension GOVPlayBack {
         viewModel.timeProgress = current/d
         viewModel.time = current
         if current >= d {
-            self.viewModel.excute(.pause)
+            self.viewModel.request = .pause
             self.onCompleted()
         }
     }
@@ -391,7 +391,7 @@ extension GOVPlayBack {
     }
     
     func onCompleted(){
-        if viewModel.playerState?.isPlay != true {return}
+        if viewModel.playerState?.isStreaming != true {return}
         DataLog.d("onCompleted", tag: self.tag)
         viewModel.playerState = .complete
         viewModel.streamEvent = .completed
