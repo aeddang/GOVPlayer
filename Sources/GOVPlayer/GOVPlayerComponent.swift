@@ -5,35 +5,35 @@ import MediaPlayer
 
 extension GOVPlayer{
     open class UIViewModel: ObservableObject, GOVPlayerProtocol {
-        @Published fileprivate(set) var request:UIRequest? = nil{
+        @Published public fileprivate(set) var request:UIRequest? = nil{
             didSet{
                 if request != nil { self.request = nil }
             }
         }
-        @Published fileprivate(set) var state:UIState = .hidden
+        @Published public fileprivate(set) var state:UIState = .hidden
         
-        @Published fileprivate(set) var time:String? = nil
-        @Published fileprivate(set) var remainingTime:String = "0:00:00"
-        @Published fileprivate(set) var duration:String = "0:00:00"
-        @Published fileprivate(set) var startTime:String? = nil
-        @Published fileprivate(set) var endTime:String? = nil
-        @Published fileprivate(set) var progress:Double = 0
+        @Published public fileprivate(set) var time:String? = nil
+        @Published public fileprivate(set) var remainingTime:String = "0:00:00"
+        @Published public fileprivate(set) var duration:String = "0:00:00"
+        @Published public fileprivate(set) var startTime:String? = nil
+        @Published public fileprivate(set) var endTime:String? = nil
+        @Published public fileprivate(set) var progress:Double = 0
 
-        @Published fileprivate(set) var isError = false
-        fileprivate(set) var errorMessage:String? = nil
+        @Published public fileprivate(set) var isError = false
+        public fileprivate(set) var errorMessage:String? = nil
         
-        @Published fileprivate(set) var isLock = false
-        @Published fileprivate(set) var isLoading = false
-        @Published fileprivate(set) var isMute = true
-        @Published fileprivate(set) var showUI: Bool = false
-        @Published fileprivate(set) var showProgress: Bool = false
-        @Published fileprivate(set) var isLive:Bool? = nil
+        @Published public fileprivate(set) var isLock = false
+        @Published public fileprivate(set) var isLoading = false
+        @Published public fileprivate(set) var isMute = true
+        @Published public fileprivate(set) var showUI: Bool = false
+        @Published public fileprivate(set) var showProgress: Bool = false
+        @Published public fileprivate(set) var isLive:Bool? = nil
         
-        @Published fileprivate(set) var useSeek = false
-        @Published fileprivate(set) var isSeeking = false
-        @Published fileprivate(set) var seekForward:Double? = nil
-        @Published fileprivate(set) var seekBackward:Double? = nil
-        @Published fileprivate(set) var usePip:Bool = false
+        @Published public fileprivate(set) var useSeek = false
+        @Published public fileprivate(set) var isSeeking = false
+        @Published public fileprivate(set) var seekForward:Double? = nil
+        @Published public fileprivate(set) var seekBackward:Double? = nil
+        @Published public fileprivate(set) var usePip:Bool = false
         public init(){}
         fileprivate func reset(){
             self.progress = 0
