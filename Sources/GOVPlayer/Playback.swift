@@ -215,7 +215,7 @@ extension GOVPlayBack {
         viewModel.timeProgress = current/d
         viewModel.time = current
         if current >= d {
-            self.viewModel.request = .pause
+            self.viewModel.excute(.pause)
             self.onCompleted()
         }
     }
