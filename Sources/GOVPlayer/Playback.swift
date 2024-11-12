@@ -152,6 +152,7 @@ extension GOVPlayer {
         }
         
         private var requestHandler:((Request) -> Void)? = nil
+        
         @discardableResult
         public func excute(_ request:Request)->ViewModel {
             switch request {
@@ -215,8 +216,9 @@ extension GOVPlayBack {
         viewModel.timeProgress = current/d
         viewModel.time = current
         if current >= d {
-            self.viewModel.excute(.pause)
+            
             self.onCompleted()
+            
         }
     }
     
@@ -390,11 +392,14 @@ extension GOVPlayBack {
         viewModel.streamEvent = .stoped
     }
     
+    
     func onCompleted(){
         if viewModel.playerState?.isStreaming != true {return}
         DataLog.d("onCompleted", tag: self.tag)
+        self.viewModel.excute(.pause)
         viewModel.playerState = .complete
         viewModel.streamEvent = .completed
+        
     }
     func onPipStateChanged(_ State:GOVPlayer.PipState){
         viewModel.playerPipState = State
