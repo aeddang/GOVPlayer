@@ -178,6 +178,7 @@ extension GOVPlayBack {
     func onTimeChange(_ t:Double){
         guard !(t.isNaN || t.isInfinite) else { return }
         guard let mode = self.viewModel.playMode else {return}
+        if self.viewModel.playerState?.isPlay != true {return}
         self.viewModel.originTime = t
         if mode.isLive {
             self.onLivePlay(t)
