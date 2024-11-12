@@ -22,6 +22,7 @@ extension GOVPlayer{
         @Published fileprivate(set) var isError = false
         fileprivate(set) var errorMessage:String? = nil
         
+        @Published fileprivate(set) var isLock = false
         @Published fileprivate(set) var isLoading = false
         @Published fileprivate(set) var isMute = true
         @Published fileprivate(set) var showUI: Bool = false
@@ -120,7 +121,8 @@ extension GOVPlayer{
                 case .stay(let state) :
                     self.uiModel.state = state
                     self.autoUiHidden.cancel()
-                    
+                case .lock(let isLock) :
+                    self.uiModel.isLock = isLock
                 }
             }
             .onReceive(self.viewModel.$duration) { d in
