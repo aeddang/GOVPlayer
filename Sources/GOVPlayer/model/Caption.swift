@@ -9,13 +9,13 @@ import Foundation
 extension GOVPlayer{
     
     
-    struct Caption{
+    public struct Caption{
         var lang:LangType? = nil
         var size:CGFloat = 130
         var color:Color = Color.white
     }
     
-    enum LangType:String, CaseIterable{
+    public enum LangType:String, CaseIterable{
         case ko, en, ja, zh, vi, ru, ms, id, tl, th, hi, notUsed
         var decription: String {
             switch self {

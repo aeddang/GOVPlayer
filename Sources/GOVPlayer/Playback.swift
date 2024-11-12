@@ -13,61 +13,62 @@ extension GOVPlayer {
     @MainActor public static var seekMoveDefaultValue:Double = 15
     open class ViewModel: ObservableObject {
         private var anyCancellable = Set<AnyCancellable>()
-        private(set) var path:String = ""
+        public private(set) var path:String = ""
         /*사용자지정 속성*/
         private(set) var useAvPlayerController:Bool = false
         private(set) var useAvPlayerControllerUI:Bool = false
         
         /*event*/
-        @Published fileprivate(set) var request:Request? = nil{
+        @Published public fileprivate(set) var request:Request? = nil{
             didSet{
                 if request != nil { self.request = nil }
             }
         }
         
-        @Published fileprivate(set) var streamEvent:StreamEvent? = nil{
+        @Published public fileprivate(set) var streamEvent:StreamEvent? = nil{
             didSet{
                 if streamEvent != nil { self.streamEvent = nil }
             }
         }
        
         
-        @Published fileprivate(set) var error:PlayerError? = nil
-        @Published fileprivate(set) var playerState:State? = nil
-        @Published fileprivate(set) var streamState:StreamState? = nil
-        @Published fileprivate(set) var playerPipState:PipState = .off
-        @Published fileprivate(set) var playMode:Mode? = nil
+        @Published public fileprivate(set) var error:PlayerError? = nil
+        @Published public fileprivate(set) var playerState:State? = nil
+        @Published public fileprivate(set) var streamState:StreamState? = nil
+        @Published public fileprivate(set) var playerPipState:PipState = .off
+        @Published public fileprivate(set) var playMode:Mode? = nil
         
-        @Published fileprivate(set) var volume:Float = -1
-        @Published fileprivate(set) var bitrate:Double? = nil
-        @Published fileprivate(set) var rate:Float = 1.0
-        @Published fileprivate(set) var assetInfo:AssetPlayerInfo? = nil
-        @Published fileprivate(set) var subtitles:[LangType]? = nil
-        @Published fileprivate(set) var caption:Caption = .init()
+        @Published public fileprivate(set) var volume:Float = -1
+        @Published public fileprivate(set) var bitrate:Double? = nil
+        @Published public fileprivate(set) var rate:Float = 1.0
+        @Published public fileprivate(set) var assetInfo:AssetPlayerInfo? = nil
+        @Published public fileprivate(set) var subtitles:[LangType]? = nil
+        @Published public fileprivate(set) var caption:Caption = .init()
         
-        @Published fileprivate(set) var screenRatio:CGFloat = 1.0
-        @Published fileprivate(set) var screenGravity:AVLayerVideoGravity = .resizeAspect
-        @Published private(set) var playEvents:[Double:String] = [:]
-        @Published private(set) var nextEventTime:Double? = nil
+        @Published public fileprivate(set) var screenRatio:CGFloat = 1.0
+        @Published public fileprivate(set) var screenGravity:AVLayerVideoGravity = .resizeAspect
+        @Published public private(set) var playEvents:[Double:String] = [:]
+        @Published public private(set) var nextEventTime:Double? = nil
         
-        @Published fileprivate(set) var isMute:Bool = false
-        private(set) var useLoof:Bool = false
-        private(set) var usePip:Bool = true // pip사용여부
-        private(set) var useSeeking:Bool = true // 비디오 서치 사용여부
-        @Published fileprivate(set) var allowSeeking:Bool? = nil
-        @Published private(set) var allowPip:Bool? = nil
+        @Published public fileprivate(set) var isMute:Bool = false
+        private(set) public var useLoof:Bool = false
+        private(set) public var usePip:Bool = true // pip사용여부
+        private(set) public var useSeeking:Bool = true // 비디오 서치 사용여부
+        @Published public fileprivate(set) var allowSeeking:Bool? = nil
+        @Published public private(set) var allowPip:Bool? = nil
         
         private(set) var drm:FairPlayDrm? = nil
         private(set) var prevCertificate:Data? = nil
-        fileprivate(set) var initTime:Double? = nil
-        fileprivate(set) var isLoaded:Bool = false
-        fileprivate(set) var timeProgress:Double = 0.0
-        fileprivate(set) var originTime:Double = 0.0
-        fileprivate(set) var originDuration:Double = 0.0
-        fileprivate(set) var streamStartTime:Double? = nil
-        @Published fileprivate(set) var time:Double = 0.0
-        fileprivate(set) var remainingTime:Double = 0.0
-        @Published fileprivate(set) var duration:Double? = nil
+        
+        public fileprivate(set) var initTime:Double? = nil
+        public fileprivate(set) var isLoaded:Bool = false
+        public fileprivate(set) var timeProgress:Double = 0.0
+        public fileprivate(set) var originTime:Double = 0.0
+        public fileprivate(set) var originDuration:Double = 0.0
+        public fileprivate(set) var streamStartTime:Double? = nil
+        @Published public fileprivate(set) var time:Double = 0.0
+        public fileprivate(set) var remainingTime:Double = 0.0
+        @Published public fileprivate(set) var duration:Double? = nil
         
        
         // only file
