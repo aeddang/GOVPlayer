@@ -258,7 +258,11 @@ extension GOVPlayBack {
    
     
     func onDurationChange(_ t:Double){
-        let mode = viewModel.playMode ?? ((t > 0) ? .vod : .live(start: nil, end: nil))
+        if viewModel.playMode == nil {
+            let mode:GOVPlayer.Mode =  (t > 0) ? .vod : .live(start: nil, end: nil)
+            self.viewModel.playMode = mode
+        }
+        guard let mode = viewModel.playMode else {return}
         viewModel.originDuration = t
         if t <= 0 { return }
         let allowSeeking = viewModel.useSeeking ? true : false
