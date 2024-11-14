@@ -216,10 +216,8 @@ extension GOVPlayBack {
         viewModel.remainingTime = d - current
         viewModel.timeProgress = current/d
         viewModel.time = current
-        if current >= d {
-            
+        if current >= d && self.viewModel.playerState?.isPlay == true{
             self.onCompleted()
-            
         }
     }
     
