@@ -395,9 +395,9 @@ extension GOVPlayBack {
     func onCompleted(){
         if viewModel.playerState?.isStreaming != true {return}
         DataLog.d("onCompleted", tag: self.tag)
-        self.viewModel.excute(.pause)
         viewModel.playerState = .complete
         viewModel.streamEvent = .completed
+        self.viewModel.excute(.pause)
         
     }
     func onPipStateChanged(_ State:GOVPlayer.PipState){
