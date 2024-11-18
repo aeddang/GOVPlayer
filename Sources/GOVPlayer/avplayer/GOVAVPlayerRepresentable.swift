@@ -83,7 +83,7 @@ extension GOVAVPlayerRepresentable: UIViewControllerRepresentable,
     func excute(_ request: GOVPlayer.Request, controller:GOVAVPlayerController?) {
         guard let player = controller?.govPlayer else {return}
         switch request {
-        case .load(let path, let autoPlay, let initTime):
+        case .load(let path, let autoPlay, let initTime, let drm):
             viewModel.reset(isAll: false)
             self.onLoad()
             player.load(path, isAutoPlay:autoPlay, initTime: initTime,

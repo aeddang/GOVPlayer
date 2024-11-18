@@ -35,7 +35,7 @@ extension GOVPlayer{
     
     
     public enum Request {//input
-        case load(path:String, autoPlay:Bool = true, initTime:Double = 0.0),
+        case load(path:String, autoPlay:Bool = true, initTime:Double = 0.0, drm:FairPlayDrm? = nil),
              togglePlay,
              resume,
              pause,

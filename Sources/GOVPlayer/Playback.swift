@@ -155,13 +155,14 @@ extension GOVPlayer {
         
         @discardableResult
         public func excute(_ request:Request)->ViewModel {
+            self.request = request
+            self.requestHandler?(request)
             switch request {
-            case .load(let path, _ , _):
+            case .load(let path, _ , _, let drm):
+                self.drm = drm
                 self.path = path
             default: break
             }
-            self.request = request
-            self.requestHandler?(request)
             return self
         }
         
