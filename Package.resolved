@@ -1,0 +1,42 @@
+{
+  "originHash" : "b88ef921baa2517b71dc2c069084baa46637ae1c0c2b6ccf1a75316682486c13",
+  "pins" : [
+    {
+      "identity" : "golibrary",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/aeddang/GOLibrary.git",
+      "state" : {
+        "revision" : "230f127b1e2987c365e3d07c4b4a22e6fe177a88",
+        "version" : "1.0.6"
+      }
+    },
+    {
+      "identity" : "kingfisher",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/onevcat/Kingfisher",
+      "state" : {
+        "revision" : "2ef543ee21d63734e1c004ad6c870255e8716c50",
+        "version" : "7.12.0"
+      }
+    },
+    {
+      "identity" : "lottie-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/airbnb/lottie-ios",
+      "state" : {
+        "revision" : "fe4c6fe3a0aa66cdeb51d549623c82ca9704b9a5",
+        "version" : "4.5.0"
+      }
+    },
+    {
+      "identity" : "reachability.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ashleymills/Reachability.swift",
+      "state" : {
+        "revision" : "21d1dc412cfecbe6e34f1f4c4eb88d3f912654a6",
+        "version" : "5.2.4"
+      }
+    }
+  ],
+  "version" : 3
+}

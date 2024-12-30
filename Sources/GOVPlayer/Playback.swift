@@ -8,7 +8,7 @@ import SwiftUI
 import Foundation
 import AVFoundation
 import Combine
-
+import GOLibrary
 extension GOVPlayer {
     @MainActor public static var seekMoveDefaultValue:Double = 15
     open class ViewModel: ObservableObject {

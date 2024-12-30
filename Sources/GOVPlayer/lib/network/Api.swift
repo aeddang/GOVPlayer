@@ -5,6 +5,7 @@
 //  Created by JeongCheol Kim on 10/31/24.
 //
 import Foundation
+import GOLibrary
 extension GOVPlayer{
     class PlayerApi: Rest{
         func getLicenseData(ckcUR: String, params: [String : Any],

@@ -9,6 +9,7 @@ import SwiftUI
 import Combine
 import AVKit
 import MediaPlayer
+import GOLibrary
 
 
 extension GOVAVPlayerRepresentable: UIViewControllerRepresentable,
@@ -40,9 +41,8 @@ extension GOVAVPlayerRepresentable: UIViewControllerRepresentable,
                 runningDelegate: playerController,
                 playerController: playerController
             )
-            DispatchQueue.main.async {
-                self.onStandby()
-            }
+            
+            self.onStandby()
             self.viewModel.setupExcuter(){ request in
                 self.excute(request, controller: playerController)
             }

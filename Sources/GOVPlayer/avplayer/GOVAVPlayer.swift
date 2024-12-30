@@ -10,6 +10,7 @@ import SwiftUI
 import Combine
 import AVKit
 import MediaPlayer
+import GOLibrary
 
 
 protocol GOVAVPlayerDelegate{

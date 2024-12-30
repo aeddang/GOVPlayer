@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 import Combine
 import MediaPlayer
-
+import GOLibrary
 extension GOVPlayer{
     open class UIViewModel: ObservableObject, GOVPlayerProtocol {
         @Published public fileprivate(set) var request:UIRequest? = nil{
@@ -54,7 +54,7 @@ extension GOVPlayer{
             return t.secToHourString()
         }
         open func getTimestampString(_ t:Double) -> String {
-            return t.toDate().toDateFormatter(dateFormat: "HH:mm")
+            return t.toDate().toDateFormatter("HH:mm")
         }
         
         @discardableResult

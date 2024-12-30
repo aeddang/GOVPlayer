@@ -7,6 +7,7 @@
 import Foundation
 import AVKit
 import SwiftUI
+import GOLibrary
 extension GOVPlayer{
 
     

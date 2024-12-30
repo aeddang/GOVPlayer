@@ -3,6 +3,7 @@
 import SwiftUI
 import Foundation
 import AVFoundation
+import GOLibrary
 
 public class GOVPlayer{
     internal static let TIME_SCALE:Double = 600

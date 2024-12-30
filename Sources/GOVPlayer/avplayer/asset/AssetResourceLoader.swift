@@ -8,6 +8,7 @@
 import Foundation
 import AVFoundation
 import Combine
+import GOLibrary
 extension GOVPlayer{
     class AssetResourceLoader: NSObject, @preconcurrency AVAssetResourceLoaderDelegate, GOVPlayerProtocol {
         static let scheme = "Asset"

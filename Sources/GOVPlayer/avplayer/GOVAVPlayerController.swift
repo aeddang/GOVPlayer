@@ -11,7 +11,7 @@ import SwiftUI
 import Combine
 import AVKit
 import MediaPlayer
-
+import GOLibrary
 
 protocol GOVAVPlayerControllerDelegate{
     func onPlayerTimeChange(_ playerController: GOVAVPlayerController, t:CMTime)

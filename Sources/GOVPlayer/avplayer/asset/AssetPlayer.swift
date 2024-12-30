@@ -1,5 +1,7 @@
 import Foundation
 import AVFoundation
+import GOLibrary
+
 extension GOVPlayer{
     class AssetPlayer: AVPlayer , GOVPlayerProtocol, Identifiable{
         private let keyProvider = AVContentKeyProvider()
