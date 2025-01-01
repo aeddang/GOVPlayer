@@ -13,7 +13,7 @@ let package = Package(
             targets: ["GOVPlayer"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/aeddang/GOLibrary.git", from: "1.0.3")
+        .package(url: "https://github.com/aeddang/GOLibrary.git", from: "1.0.6")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
