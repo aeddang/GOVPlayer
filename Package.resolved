@@ -1,13 +1,13 @@
 {
-  "originHash" : "b88ef921baa2517b71dc2c069084baa46637ae1c0c2b6ccf1a75316682486c13",
+  "originHash" : "91c6e200691d5e0b234359a45c92860a4dde044092ea11b9bc1591943f4c51cf",
   "pins" : [
     {
       "identity" : "golibrary",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/aeddang/GOLibrary.git",
       "state" : {
-        "revision" : "230f127b1e2987c365e3d07c4b4a22e6fe177a88",
-        "version" : "1.0.6"
+        "revision" : "08f68ee76b9115dbf7ec02cd5e7c4af75d200ae5",
+        "version" : "1.0.18"
       }
     },
     {
