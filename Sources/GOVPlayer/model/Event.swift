@@ -53,7 +53,12 @@ extension GOVPlayer{
                 color:Color? = nil, position:CGFloat? = nil
              ),
              pip(Bool), usePip(Bool),
-             next, prev
+             next, prev,
+             updateNowplayInfoData(
+                contentId:String,
+                title:String? = nil,
+                artImage:String? = nil
+             )
         
     }
     

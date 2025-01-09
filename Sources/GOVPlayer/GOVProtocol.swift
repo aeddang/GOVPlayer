@@ -5,10 +5,7 @@ import Foundation
 import AVFoundation
 import GOLibrary
 
-public class GOVPlayer{
-    internal static let TIME_SCALE:Double = 600
-    internal static let INIT_TIME_END_LIMITED:Double = 10
-}
+
 
 protocol GOVPlayerProtocol {}
 extension GOVPlayerProtocol {

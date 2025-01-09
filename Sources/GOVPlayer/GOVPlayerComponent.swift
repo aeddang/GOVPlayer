@@ -34,6 +34,7 @@ extension GOVPlayer{
         @Published public fileprivate(set) var seekForward:Double? = nil
         @Published public fileprivate(set) var seekBackward:Double? = nil
         @Published public fileprivate(set) var usePip:Bool = false
+   
         public init(){}
         fileprivate func reset(){
             self.progress = 0
@@ -136,11 +137,18 @@ extension GOVPlayer{
                 guard let d = d else {return}
                 self.uiModel.time = self.uiModel.getTimeString(0)
                 self.uiModel.duration = self.uiModel.getTimeString(d)
+                self.viewModel.nowPlayingInfoManager?.updatePlayNow(
+                    duration: d,
+                    initTime: 0,
+                    isPlay: self.viewModel.playerState?.isPlaying ?? false)
             }
             .onReceive(self.viewModel.$time) { t in
                 self.uiModel.time = self.uiModel.getTimeString(t)
                 self.uiModel.progress = self.viewModel.timeProgress
                 self.uiModel.remainingTime = self.uiModel.getTimeString(self.viewModel.remainingTime)
+                self.viewModel.nowPlayingInfoManager?.updatePlay(
+                    time: t, isPlay: self.viewModel.playerState?.isPlaying ?? false,
+                    rate: self.viewModel.rate)
             }
             
             .onReceive(self.viewModel.$error) { err in
@@ -201,6 +209,7 @@ extension GOVPlayer{
                     self.uiModel.isSeeking = false
                 case .seeked:
                     self.uiModel.isSeeking = false
+                    self.viewModel.nowPlayingInfoManager?.updateStop()
                 case .completed :
                     if self.viewModel.useLoof {
                         self.viewModel.excute(.seek(time:0, andPlay: true))
@@ -235,6 +244,7 @@ extension GOVPlayer{
             .onDisappear(){
                 self.autoUiHidden.cancel()
                 self.autoResetSeekMove.cancel()
+                self.viewModel.nowPlayingInfoManager?.updateStop()
             }
             
         }

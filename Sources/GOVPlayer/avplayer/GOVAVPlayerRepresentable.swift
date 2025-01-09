@@ -335,8 +335,8 @@ extension GOVAVPlayerRepresentable: UIViewControllerRepresentable,
         commandCenter.togglePlayPauseCommand.addTarget(handler: self.onRemoteTogglePlay)
         commandCenter.playCommand.addTarget(handler: self.onRemoteResume)
         commandCenter.pauseCommand.addTarget(handler: self.onRemotePause)
-        commandCenter.skipBackwardCommand.preferredIntervals = [NSNumber(value:-GOVPlayer.seekMoveDefaultValue)]
-        commandCenter.skipForwardCommand.preferredIntervals = [NSNumber(value:GOVPlayer.seekMoveDefaultValue)]
+        commandCenter.skipBackwardCommand.preferredIntervals = [NSNumber(value:-self.viewModel.seekMoveDefaultValue)]
+        commandCenter.skipForwardCommand.preferredIntervals = [NSNumber(value:self.viewModel.seekMoveDefaultValue)]
         commandCenter.skipBackwardCommand.addTarget(handler: self.onRemoteSkipBackward)
         commandCenter.skipForwardCommand.addTarget(handler: self.onRemoteSkipForward)
         commandCenter.changePlaybackPositionCommand.addTarget(handler: self.onRemoteChangePlaybackPosition)
@@ -373,12 +373,12 @@ extension GOVAVPlayerRepresentable: UIViewControllerRepresentable,
     }
     @MainActor
     func onRemoteSkipBackward(_ evt:MPRemoteCommandEvent) -> MPRemoteCommandHandlerStatus {
-        self.viewModel.excute(.seekMove(-GOVPlayer.seekMoveDefaultValue, andPlay: nil))
+        self.viewModel.excute(.seekMove(-self.viewModel.seekMoveDefaultValue, andPlay: nil))
         return MPRemoteCommandHandlerStatus.success
     }
     @MainActor
     func onRemoteSkipForward(_ evt:MPRemoteCommandEvent) -> MPRemoteCommandHandlerStatus {
-        self.viewModel.excute(.seekMove(GOVPlayer.seekMoveDefaultValue, andPlay: nil))
+        self.viewModel.excute(.seekMove(self.viewModel.seekMoveDefaultValue, andPlay: nil))
         return MPRemoteCommandHandlerStatus.success
     }
     @MainActor

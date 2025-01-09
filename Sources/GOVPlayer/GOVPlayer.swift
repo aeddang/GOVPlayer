@@ -9,9 +9,11 @@ import Foundation
 import AVFoundation
 import Combine
 import GOLibrary
+import Kingfisher
+public class GOVPlayer{}
 extension GOVPlayer {
-    @MainActor public static var seekMoveDefaultValue:Double = 15
-    open class ViewModel: ObservableObject {
+    
+    open class ViewModel: ObservableObject, GOVPlayerProtocol {
         private var anyCancellable = Set<AnyCancellable>()
         public private(set) var path:String = ""
         /*사용자지정 속성*/
@@ -54,6 +56,7 @@ extension GOVPlayer {
         private(set) public var useLoof:Bool = false
         private(set) public var usePip:Bool = true // pip사용여부
         private(set) public var useSeeking:Bool = true // 비디오 서치 사용여부
+        @Published public fileprivate(set) var seekMoveDefaultValue:Double = 15
         @Published public fileprivate(set) var allowSeeking:Bool? = nil
         @Published public private(set) var allowPip:Bool? = nil
         
@@ -69,7 +72,7 @@ extension GOVPlayer {
         @Published public fileprivate(set) var time:Double = 0.0
         public fileprivate(set) var remainingTime:Double = 0.0
         @Published public fileprivate(set) var duration:Double? = nil
-        
+        public fileprivate(set) var nowPlayingInfoManager:NowPlayingInfoManager? = .init()
        
         // only file
         fileprivate var toMinimizeStallsCount:Int = 0
@@ -130,7 +133,9 @@ extension GOVPlayer {
             useLoof:Bool? = nil,
             rate:Float? = nil,
             screenRatio:CGFloat? = nil,
-            screenGravity:AVLayerVideoGravity? = nil)->ViewModel{
+            screenGravity:AVLayerVideoGravity? = nil,
+            seekMoveDefaultValue:Double? = nil
+        )->ViewModel{
             
             if let v = mode { self.playMode = v }
             if let v = useSeeking { self.useSeeking = v }
@@ -140,6 +145,13 @@ extension GOVPlayer {
             if let v = rate { self.rate = v }
             if let v = screenRatio { self.screenRatio = v }
             if let v = screenGravity { self.screenGravity = v }
+            if let v = seekMoveDefaultValue { self.seekMoveDefaultValue = v }
+            return self
+        }
+        
+        @discardableResult
+        public func updateNowPlayingInfoManager (_ info:NowPlayingInfoManager? = nil)->ViewModel{
+            self.nowPlayingInfoManager = info
             return self
         }
         
@@ -152,7 +164,6 @@ extension GOVPlayer {
         }
         
         private var requestHandler:((Request) -> Void)? = nil
-        
         @discardableResult
         public func excute(_ request:Request)->ViewModel {
             self.request = request
@@ -161,6 +172,25 @@ extension GOVPlayer {
             case .load(let path, _ , _, let drm):
                 self.drm = drm
                 self.path = path
+            case .updateNowplayInfoData(let contentId, let title, let artImage) :
+                if let img = artImage, let url = URL(string: img) {
+                    KingfisherManager.shared.downloader.downloadImage(with: url, options: .init()){ res in
+                        switch res {
+                        case .success(let value):
+                            DataLog.d("loaded image", tag: self.tag)
+                            self.nowPlayingInfoManager?.updateMetaData(contentId: contentId, title: title ?? "")
+                            self.nowPlayingInfoManager?.updateArtwork(imageData: value.image)
+                            
+                        case .failure(let e):
+                            DataLog.d("loaded image error " + e.localizedDescription , tag:self.tag)
+                        }
+                        self.nowPlayingInfoManager?.updateMetaData(contentId: contentId, title: title ?? "")
+                    }
+                    
+                } else {
+                    self.nowPlayingInfoManager?.updateMetaData(contentId: contentId, title: title ?? "")
+                }
+                
             default: break
             }
             return self
